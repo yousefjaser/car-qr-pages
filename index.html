@@ -87,14 +87,24 @@
 
     <script>
         // دالة لفتح التطبيق
-        function openApp(carId) {
+        function openApp(carId, type) {
+            console.log(`Opening app with carId=${carId}, type=${type}`);
+            
             // محاولة فتح التطبيق بعدة طرق
-            window.location.href = `exp://192.168.1.112:8081/--/car/${carId}`; 
+            if (type === 'native') {
+                window.location.href = `yazcar://car/${carId}`;
+            } else if (type === 'expo') {
+                // رابط الإكسبو جو في وضع التطوير (بدون تحديد IP)
+                window.location.href = `exp://car/${carId}`;
+            } else {
+                // محاولة الوضع الافتراضي - التطبيق المثبت
+                window.location.href = `yazcar://car/${carId}`;
+            }
             
             // فترة الانتظار للتأكد من التنقل
             setTimeout(() => {
                 // إذا لم يتم فتح التطبيق، اقترح التنزيل
-                alert('لم نتمكن من فتح التطبيق. يرجى التأكد من تثبيت التطبيق أولا.');
+                alert('لم نتمكن من فتح التطبيق. يرجى التأكد من تثبيت التطبيق أولا أو استخدام Expo Go في وضع التطوير.');
             }, 2000);
         }
         
@@ -111,18 +121,29 @@
 
                 // محاولة فتح التطبيق عبر Deep Link
                 setTimeout(() => {
-                    // تجربة بالفورمات الصحيح
-                   window.location.href = `exp://192.168.1.112:8081/--/car/${carId}`; 
+                    // رابط للإكسبو جو في وضع التطوير - تعميم الرابط بدون IP
+                    const expoDevelopmentLink = `exp://car/${carId}`;
+                    // الرابط الطبيعي لـ Deep Link
+                    const nativeAppLink = `yazcar://car/${carId}`;
+                    
+                    // تجربة فتح التطبيق أولا
+                    window.location.href = nativeAppLink;
+                    
+                    // إضافة معلومات أكثر للمستخدم
+                    document.getElementById('carInfo').innerHTML += `
+                        <div style="margin-top: 15px; text-align: center;">
+                            <p style="color: #555; margin-bottom: 15px;">إذا لم يفتح التطبيق تلقائياً، استخدم أحد الروابط التالية:</p>
+                            
+                            <button onclick="openApp('${carId}', 'native')" style="background-color: #2e86de; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin: 5px;">
+                                فتح التطبيق المثبت
+                            </button>
+                            
+                            <button onclick="openApp('${carId}', 'expo')" style="background-color: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin: 5px;">
+                                فتح في Expo Go (للتطوير)
+                            </button>
+                        </div>
+                    `;
                 }, 1000);
-
-                // إضافة زر لفتح التطبيق يدوياً
-                document.getElementById('carInfo').innerHTML += `
-                    <div style="margin-top: 15px; text-align: center;">
-                        <button onclick="openApp('${carId}')" style="background-color: #2e86de; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
-                            فتح التطبيق
-                        </button>
-                    </div>
-                `;
             } else {
                 document.getElementById('carInfo').innerHTML = `
                     <p>لم يتم توفير معرف للسيارة. الرجاء مسح رمز QR صحيح.</p>
