@@ -86,6 +86,18 @@
     </div>
 
     <script>
+        // دالة لفتح التطبيق
+        function openApp(carId) {
+            // محاولة فتح التطبيق بعدة طرق
+            window.location.href = `yazcar://car/${carId}`;
+            
+            // فترة الانتظار للتأكد من التنقل
+            setTimeout(() => {
+                // إذا لم يتم فتح التطبيق، اقترح التنزيل
+                alert('لم نتمكن من فتح التطبيق. يرجى التأكد من تثبيت التطبيق أولا.');
+            }, 2000);
+        }
+        
         // استخراج معرف السيارة من URL الحالي
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -99,8 +111,18 @@
 
                 // محاولة فتح التطبيق عبر Deep Link
                 setTimeout(() => {
-                    window.location.href = `exp://192.168.1.112:8081/--/car/${carId}`;
+                    // تجربة بالفورمات الصحيح
+                    window.location.href = `yazcar://car/${carId}`;
                 }, 1000);
+
+                // إضافة زر لفتح التطبيق يدوياً
+                document.getElementById('carInfo').innerHTML += `
+                    <div style="margin-top: 15px; text-align: center;">
+                        <button onclick="openApp('${carId}')" style="background-color: #2e86de; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+                            فتح التطبيق
+                        </button>
+                    </div>
+                `;
             } else {
                 document.getElementById('carInfo').innerHTML = `
                     <p>لم يتم توفير معرف للسيارة. الرجاء مسح رمز QR صحيح.</p>
